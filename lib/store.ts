@@ -4,7 +4,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api"
 
 interface UserState {
   user: {
-    id: string | null
+    _id: string | null
     name: string | null
     email: string | null
     membershipLevel: string | null
@@ -23,12 +23,13 @@ interface UserState {
     lastName: string
     email: string
     password: string
+    isAdmin: false
   }) => Promise<boolean>
 }
 
 export const useUserStore = create<UserState>((set) => ({
   user: {
-    id: null,
+    _id: null,
     name: null,
     email: null,
     membershipLevel: null,
@@ -43,7 +44,7 @@ export const useUserStore = create<UserState>((set) => ({
   initialize: async () => {
     try {
       const res = await fetch(`${API_URL}/auth/profile`, {
-        credentials: "include", // importante si usás cookies para auth
+        credentials: "include",
       })
 
       if (!res.ok) throw new Error("No autorizado")
@@ -52,14 +53,14 @@ export const useUserStore = create<UserState>((set) => ({
 
       set({
         user: {
-          id: data.id,
-          name: data.name,
+          _id: data._id,
+          name: data.firstName + ' ' + data.lastName,
           email: data.email,
           membershipLevel: data.membershipLevel,
           memberSince: data.memberSince,
           membershipId: data.membershipId,
           nextRenewal: data.nextRenewal,
-          isAdmin: data.isAdmin,
+          isAdmin: data?.isAdmin || false,
         },
         isAuthenticated: true,
         isLoading: false,
@@ -85,7 +86,7 @@ export const useUserStore = create<UserState>((set) => ({
 
       set({
         user: {
-          id: data.id,
+          _id: data.id,
           name: data.name,
           email: data.email,
           membershipLevel: data.membershipLevel,
@@ -116,7 +117,7 @@ export const useUserStore = create<UserState>((set) => ({
 
     set({
       user: {
-        id: null,
+        _id: null,
         name: null,
         email: null,
         membershipLevel: null,
@@ -144,7 +145,7 @@ export const useUserStore = create<UserState>((set) => ({
 
       set({
         user: {
-          id: data.id,
+          _id: data.id,
           name: data.name,
           email: data.email,
           membershipLevel: data.membershipLevel,

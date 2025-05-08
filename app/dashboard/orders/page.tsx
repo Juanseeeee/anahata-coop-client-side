@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Leaf, User, FileText, Calendar, Settings, LogOut, Bell, Package, Clock, CheckCircle } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
+import { CartDropdown } from "@/components/cart-dropdown"
 
 export default function OrdersPage() {
   // Mock order data
@@ -50,6 +51,7 @@ export default function OrdersPage() {
           <span className="ml-2 text-xl font-bold">GreenCoop</span>
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6">
+        <CartDropdown />
           <Button variant="ghost" size="icon">
             <Bell className="h-5 w-5" />
             <span className="sr-only">Notifications</span>

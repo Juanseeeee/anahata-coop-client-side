@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { Leaf, User, FileText, Calendar, Settings, LogOut, Bell, Shield, CreditCard, Mail } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { CartDropdown } from "@/components/cart-dropdown"
 
 export default function SettingsPage() {
   const [loading, setLoading] = useState(false)
@@ -60,6 +61,7 @@ export default function SettingsPage() {
           <span className="ml-2 text-xl font-bold">GreenCoop</span>
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6">
+        <CartDropdown />
           <Button variant="ghost" size="icon">
             <Bell className="h-5 w-5" />
             <span className="sr-only">Notifications</span>

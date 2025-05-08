@@ -7,23 +7,28 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Leaf, User, FileText, Calendar, LogOut, Bell, Settings, ShieldAlert } from "lucide-react"
 import { useUserStore } from "@/lib/store"
+import { CartDropdown } from "@/components/cart-dropdown"
+
 
 export default function DashboardPage() {
   const { user } = useUserStore()
-  const [memberInfo] = useState({
+  const memberInfo = {
     name: user?.name || "John Doe",
     memberSince: user?.memberSince || "January 2023",
     membershipLevel: user?.membershipLevel || "Premium",
     membershipId: user?.membershipId || "GC-12345",
     nextRenewal: user?.nextRenewal || "January 2026",
-  })
+  }
+  const logout = useUserStore((state) => state.logout)
+  
+
 
   return (
     <div className="flex min-h-screen flex-col">
       <header className="px-4 lg:px-6 h-16 flex items-center border-b">
         <Link className="flex items-center justify-center" href="/">
           <Leaf className="h-6 w-6 text-green-600" />
-          <span className="ml-2 text-xl font-bold">GreenCoop</span>
+          <span className="ml-2 text-xl font-bold">AnahataCoop</span>
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6">
           {user?.isAdmin && (
@@ -32,6 +37,7 @@ export default function DashboardPage() {
               Admin Dashboard
             </Link>
           )}
+            <CartDropdown />
           <Button variant="ghost" size="icon">
             <Bell className="h-5 w-5" />
             <span className="sr-only">Notifications</span>
@@ -40,7 +46,8 @@ export default function DashboardPage() {
             <Settings className="h-5 w-5" />
             <span className="sr-only">Settings</span>
           </Button>
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon"
+          onClick={() => logout()}>
             <LogOut className="h-5 w-5" />
             <span className="sr-only">Logout</span>
           </Button>

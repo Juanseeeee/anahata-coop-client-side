@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -10,84 +10,61 @@ import { Input } from "@/components/ui/input"
 import { Leaf, Search, ShoppingCart, User, Settings, Bell, FileText, Calendar } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api"
+import { CartDropdown } from "@/components/cart-dropdown"
+import { useCartStore } from "@/lib/cart-store"
 
 export default function ProductsPage() {
+  type Product = {
+    _id: string
+    name: string
+    description: string
+    thcContent: string
+    cbdContent: string
+    category: string
+    price: number
+    image?: string
+    tags: string[]
+  }
   const [searchQuery, setSearchQuery] = useState("")
-  const [cartCount, setCartCount] = useState(0)
+  const { addItem } = useCartStore()
+
+  const addToCart = (product : Product) => {
+    addItem({
+      _id: product._id,
+      name: product.name,
+      price: product.price,
+      quantity: 1,
+      image: product.image,
+      thcContent: product.thcContent,
+      cbdContent: product.cbdContent,
+    })
+  }
 
   // Mock product data
-  const products = [
-    {
-      id: 1,
-      name: "Premium Blend",
-      category: "flower",
-      thcContent: "18%",
-      cbdContent: "0.5%",
-      price: 45,
-      image: "/placeholder.svg?height=200&width=200",
-      description: "A balanced hybrid strain with earthy tones and relaxing effects.",
-      tags: ["hybrid", "relaxing", "earthy"],
-    },
-    {
-      id: 2,
-      name: "Relief Tincture",
-      category: "tinctures",
-      thcContent: "5%",
-      cbdContent: "15%",
-      price: 65,
-      image: "/placeholder.svg?height=200&width=200",
-      description: "CBD-dominant tincture designed for pain relief without strong psychoactive effects.",
-      tags: ["cbd", "pain-relief", "therapeutic"],
-    },
-    {
-      id: 3,
-      name: "Energy Gummies",
-      category: "edibles",
-      thcContent: "10mg/piece",
-      cbdContent: "2mg/piece",
-      price: 30,
-      image: "/placeholder.svg?height=200&width=200",
-      description: "Sativa-infused gummies for a boost of creativity and energy.",
-      tags: ["sativa", "energizing", "edible"],
-    },
-    {
-      id: 4,
-      name: "Sleep Formula",
-      category: "tinctures",
-      thcContent: "10%",
-      cbdContent: "5%",
-      price: 55,
-      image: "/placeholder.svg?height=200&width=200",
-      description: "Indica-dominant tincture with added melatonin for improved sleep.",
-      tags: ["indica", "sleep", "nighttime"],
-    },
-    {
-      id: 5,
-      name: "Calm Cookies",
-      category: "edibles",
-      thcContent: "5mg/cookie",
-      cbdContent: "5mg/cookie",
-      price: 25,
-      image: "/placeholder.svg?height=200&width=200",
-      description: "Balanced 1:1 THC:CBD cookies for a mild, relaxing experience.",
-      tags: ["balanced", "mild", "edible"],
-    },
-    {
-      id: 6,
-      name: "Mountain Haze",
-      category: "flower",
-      thcContent: "22%",
-      cbdContent: "0.3%",
-      price: 50,
-      image: "/placeholder.svg?height=200&width=200",
-      description: "High-THC sativa strain with citrus notes and uplifting effects.",
-      tags: ["sativa", "uplifting", "citrus"],
-    },
-  ]
+  const [products, setProducts] = useState<Product[]>([])
 
-  const addToCart = () => {
-    setCartCount(cartCount + 1)
+  const fetchProducts = async () => {
+    try {
+      const res = await fetch(`${API_URL}/products`, {
+        credentials: "include",
+      })
+
+      if (!res.ok) throw new Error("No autorizado")
+
+      const data = await res.json()
+      setProducts(data)
+
+
+    } catch (error) {
+      console.error(error)
+    }
   }
+
+  useEffect(() => {
+    fetchProducts();
+  },[])
+
 
   const filteredProducts = products.filter(
     (product) =>
@@ -104,17 +81,7 @@ export default function ProductsPage() {
           <span className="ml-2 text-xl font-bold">GreenCoop</span>
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6">
-          <div className="relative">
-            <Button variant="ghost" size="icon">
-              <ShoppingCart className="h-5 w-5" />
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-green-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {cartCount}
-                </span>
-              )}
-              <span className="sr-only">Cart</span>
-            </Button>
-          </div>
+        <CartDropdown />
           <Button variant="ghost" size="icon">
             <Bell className="h-5 w-5" />
             <span className="sr-only">Notifications</span>
@@ -211,7 +178,7 @@ export default function ProductsPage() {
               <TabsContent value="all" className="space-y-4">
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {filteredProducts.map((product) => (
-                    <Card key={product.id} className="overflow-hidden">
+                    <Card key={product._id} className="overflow-hidden">
                       <div className="aspect-square relative">
                         <Image
                           src={product.image || "/placeholder.svg"}
@@ -249,7 +216,7 @@ export default function ProductsPage() {
                         </div>
                       </CardContent>
                       <CardFooter>
-                        <Button onClick={addToCart} className="w-full">
+                        <Button onClick={() => addToCart(product)} className="w-full">
                           <ShoppingCart className="mr-2 h-4 w-4" />
                           Add to Cart
                         </Button>
@@ -263,7 +230,7 @@ export default function ProductsPage() {
                   {filteredProducts
                     .filter((product) => product.category === "flower")
                     .map((product) => (
-                      <Card key={product.id} className="overflow-hidden">
+                      <Card key={product._id} className="overflow-hidden">
                         <div className="aspect-square relative">
                           <Image
                             src={product.image || "/placeholder.svg"}
@@ -301,7 +268,7 @@ export default function ProductsPage() {
                           </div>
                         </CardContent>
                         <CardFooter>
-                          <Button onClick={addToCart} className="w-full">
+                          <Button onClick={() => addToCart(product)} className="w-full">
                             <ShoppingCart className="mr-2 h-4 w-4" />
                             Add to Cart
                           </Button>
@@ -315,7 +282,7 @@ export default function ProductsPage() {
                   {filteredProducts
                     .filter((product) => product.category === "edibles")
                     .map((product) => (
-                      <Card key={product.id} className="overflow-hidden">
+                      <Card key={product._id} className="overflow-hidden">
                         <div className="aspect-square relative">
                           <Image
                             src={product.image || "/placeholder.svg"}
@@ -353,7 +320,7 @@ export default function ProductsPage() {
                           </div>
                         </CardContent>
                         <CardFooter>
-                          <Button onClick={addToCart} className="w-full">
+                          <Button onClick={() => addToCart(product)} className="w-full">
                             <ShoppingCart className="mr-2 h-4 w-4" />
                             Add to Cart
                           </Button>
@@ -367,7 +334,7 @@ export default function ProductsPage() {
                   {filteredProducts
                     .filter((product) => product.category === "tinctures")
                     .map((product) => (
-                      <Card key={product.id} className="overflow-hidden">
+                      <Card key={product._id} className="overflow-hidden">
                         <div className="aspect-square relative">
                           <Image
                             src={product.image || "/placeholder.svg"}
@@ -405,7 +372,7 @@ export default function ProductsPage() {
                           </div>
                         </CardContent>
                         <CardFooter>
-                          <Button onClick={addToCart} className="w-full">
+                          <Button onClick={() => addToCart(product)} className="w-full">
                             <ShoppingCart className="mr-2 h-4 w-4" />
                             Add to Cart
                           </Button>

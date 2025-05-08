@@ -8,9 +8,8 @@ import { useEffect, useState } from "react"
 
 export default function Home() {
   const images = [
-    "../public/logoanahata.png",
-    "../public/placeholder-logo.png",
-    "/img3.jpg"
+    "/imagen1.jpg",
+    "/fondo2-anahata.jpeg"
   ]
   const [index, setIndex] = useState(0)
   
