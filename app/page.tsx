@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Leaf } from "lucide-react"
 import { useEffect, useState } from "react"
+import { HeroCarousel } from "@/components/hero-carrousel"
 
 export default function Home() {
   const images = [
@@ -43,13 +44,7 @@ export default function Home() {
         </nav>
       </header>
       <main className="flex-1">
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-green-50"
-        style={{
-          backgroundImage: `url(${images[index]})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          transition: "background-image 1s ease-in-out"
-        }}>
+        <section className="w-full py-12 md:py-24 lg:py-32 bg-green-50">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
