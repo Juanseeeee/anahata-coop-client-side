@@ -1,12 +1,11 @@
+import { getAuthToken } from "./auth"
+
 // Base API URL
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api"
 
 // Helper function for authenticated fetch requests
 const authFetch = async (endpoint: string, options: RequestInit = {}) => {
-  // Get the token from cookies
-  const cookies = document.cookie.split(";")
-  const authCookie = cookies.find((cookie) => cookie.trim().startsWith("auth-token="))
-  const token = authCookie ? authCookie.split("=")[1] : null
+  const token = getAuthToken()
 
   if (!token) {
     throw new Error("Authentication required")
@@ -100,6 +99,29 @@ export const adminApi = {
     }),
 }
 
+// User API functions (for authenticated users)
+export const userApi = {
+  // Profile
+  getProfile: () => authFetch("/users/profile"),
+
+  updateProfile: (userData: any) =>
+    authFetch("/users/profile", {
+      method: "PUT",
+      body: JSON.stringify(userData),
+    }),
+
+  // Orders
+  getMyOrders: () => authFetch("/orders/myorders"),
+
+  getOrder: (id: string) => authFetch(`/orders/${id}`),
+
+  createOrder: (orderData: any) =>
+    authFetch("/orders", {
+      method: "POST",
+      body: JSON.stringify(orderData),
+    }),
+}
+
 // Public API functions
 export const publicApi = {
   login: (email: string, password: string) =>
@@ -129,4 +151,5 @@ export const publicApi = {
       }
       return res.json()
     }),
+
 }

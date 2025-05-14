@@ -1,4 +1,5 @@
 import { create } from "zustand"
+import { persist } from "zustand/middleware"
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api"
 
 
@@ -27,7 +28,9 @@ interface UserState {
   }) => Promise<boolean>
 }
 
-export const useUserStore = create<UserState>((set) => ({
+export const useUserStore = create<UserState>()(
+  persist(
+    (set) => ({
   user: {
     _id: null,
     name: null,
@@ -163,7 +166,14 @@ export const useUserStore = create<UserState>((set) => ({
       return false
     }
   },
-}))
+}),
+{
+  name: "user-storage", // name of the item in storage
+  skipHydration: typeof window === "undefined", // Skip hydration on server-side
+},
+),
+)
+
 
 // Initialize auth state when this module is imported
 if (typeof window !== "undefined") {
